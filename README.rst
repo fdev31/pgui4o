@@ -1,11 +1,18 @@
-# OctoPrint UI for touch LCD screens
+##################################
+OctoPrint UI for touch LCD screens
+##################################
 
 Attempt to make the printer LCD controller useless if you have a Raspberry Pi
 
 Optimized for 480x320 screens
 
+Look at the `quick demo`__!
 
-## Quickstart
+__ https://youtu.be/ve8TRxibCCY
+
+
+Quickstart
+##########
 
 - Generate an OctoPrint API key from the settings menu & save it under `API_KEY.txt`
 
@@ -15,7 +22,8 @@ Optimized for 480x320 screens
 
 - start using `./run`
 
-## Shortcuts
+Shortcuts
+=========
 
 The following shortcuts are available
 
@@ -23,3 +31,10 @@ The following shortcuts are available
 - **F** to toggle fullscreen
 - **+** and **-** to change the font size
 
+
+Roadmap
+#######
+
+Look at the `TODO list`__
+
+__ https://github.com/fdev31/pgui4o/blob/master/bugs.rst
