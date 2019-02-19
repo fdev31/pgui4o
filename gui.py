@@ -233,13 +233,13 @@ class App: # View
 
         self._screen.blit(self._backgrounds[self._cur_page], (ox, 0))
 
-        for x, y, icon in self.widgets[self._cur_page].get('icons', []):
+        for x, y, icon in self.widgets[self._cur_page]['icons']:
             self.render_image(icon(self), ox+x, y)
 
-        for text in self.widgets[self._cur_page].get('texts', []):
+        for text in self.widgets[self._cur_page]['texts']:
             self.render_text(text[2](self), ox + text[0], text[1])
 
-        for rect in self.widgets[self._cur_page].get('rects', []):
+        for rect in self.widgets[self._cur_page]['rects']:
             pos, color = rect(self)
             pos = list(pos)
             pos[0] += ox
@@ -289,6 +289,10 @@ if __name__ == "__main__" :
     fp = getResourcesPath('screens.py')
     # TODO: cleaner theme loading
     exec(open(fp).read())
+    for widget in widgets:
+        for item in 'rects texts icons'.split():
+            if item not in widget:
+                widget[item] = []
     theApp = App(actions = actions, widgets = widgets)
     theApp.default_text_color = text_color
     theApp.run()
