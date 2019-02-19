@@ -57,8 +57,8 @@ std_texts = [
 # rect: x,y,x2,y2,color (handler function)
 
 std_icons = [
-        (450, 5, lambda ui: 'icon_red' if ui.printer.offline else ('icon_blue' if ui.printer.paused else 'icon_green') ),
-        (450, 40, lambda ui: 'icon_orange' if ui.event_queue else 'icon_grey' ),
+        (452, 5, lambda ui: 'icon_red' if ui.printer.offline else ('icon_blue' if ui.printer.paused else 'icon_green') ),
+        (452, 40, lambda ui: 'icon_orange' if ui.event_queue else 'icon_grey' ),
     ]
 
 widgets = [
