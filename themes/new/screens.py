@@ -56,6 +56,11 @@ std_texts = [
 # text: x,y,text (handler function)
 # rect: x,y,x2,y2,color (handler function)
 
+std_icons = [
+        (450, 5, lambda ui: 'icon_red' if ui.printer.offline else ('icon_blue' if ui.printer.paused else 'icon_green') ),
+        (450, 40, lambda ui: 'icon_orange' if ui.event_queue else 'icon_grey' ),
+    ]
+
 widgets = [
     dict(texts=std_texts+[
         (157, 175, lambda ui: "BED: %.1f/%d"%ui.printer_info['bed']),
@@ -67,17 +72,20 @@ widgets = [
             lambda ui: ((ui.size[0]-75, 108, 63, 200),
                 (ui.event_queue, 255 if not ui.printer.offline else 0, 250 if ui.printer.paused else 0)),
             ]),
-    dict(texts=std_texts+[
+    dict(icons=std_icons,
+        texts=std_texts+[
         (104, 5, lambda ui: "X%d"%ui.printer.position_x.value),
         (202, 5, lambda ui: "Y%d"%ui.printer.position_y.value),
         (343, 5, lambda ui: "Z%d"%ui.printer.position_z.value),
         ], rects=[]),
-    dict(texts=std_texts+[
+    dict(icons=std_icons,
+        texts=std_texts+[
         (167 , 260, lambda ui: "%.1f/%d"%ui.printer_info['bed']),
         (34 , 260, lambda ui: "%.1f/%d"%ui.printer_info['extruder']),
         (321, 260, lambda ui: "%.1f%%"%ui.printer.fan_speed.percentage),
         ], rects=[]),
-    dict(texts=std_texts+[
+    dict(icons=std_icons,
+        texts=std_texts+[
         (5 , 147, lambda ui: "%.2f"%ui.printer.baby_offset.value),
         (381 , 144, lambda ui: "%.2f"%ui.printer.position_e.value),
         (190, 205, lambda ui: "Z%.2f"% (-(ui.printer.position_z.value + ui.printer.baby_offset.value))),

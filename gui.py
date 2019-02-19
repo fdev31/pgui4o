@@ -68,7 +68,7 @@ class App: # View
         if DRY_RUN:
             self.printer.http = None
         else:
-            if not DEBUG_UI:
+            if not DEBUG_UI and not os.getenv('NOFS'):
                 self.ui_toggle_fullscreen()
 
         self.ui_actions = { 'quit': self.quit }
@@ -209,6 +209,17 @@ class App: # View
         text = self.font.render(text, True, color)
         self._screen.blit(text, (x, y))
 
+    def render_image(self, name, x, y):
+        cache = getattr(self, '_image_cache', dict())
+        if name in cache:
+            image = cache[name]
+        else:
+            image = pygame.image.load(getResourcesPath('%s.png'%name)).convert_alpha()
+            cache[name] = image
+
+        self._screen.blit(image, (x, y))
+        return image
+
     def draw_ui(self):
         if self.grab_mode:
             ox = self.click_grab_cur[0] - self.click_grab_start[0]
@@ -222,10 +233,13 @@ class App: # View
 
         self._screen.blit(self._backgrounds[self._cur_page], (ox, 0))
 
-        for text in self.widgets[self._cur_page]['texts']:
+        for x, y, icon in self.widgets[self._cur_page].get('icons', []):
+            self.render_image(icon(self), ox+x, y)
+
+        for text in self.widgets[self._cur_page].get('texts', []):
             self.render_text(text[2](self), ox + text[0], text[1])
 
-        for rect in self.widgets[self._cur_page]['rects']:
+        for rect in self.widgets[self._cur_page].get('rects', []):
             pos, color = rect(self)
             pos = list(pos)
             pos[0] += ox
