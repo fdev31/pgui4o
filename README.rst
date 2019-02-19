@@ -29,7 +29,7 @@ The following shortcuts are available
 
 - **Q** to quit
 - **F** to toggle fullscreen
-- **+** and **-** to change the font size
+- click on the right "bar" on the UI to discover some features (depending on the chosen theme)
 
 
 Roadmap

@@ -176,12 +176,6 @@ class App: # View
                 if event.unicode in 'qQ':
                     self._running = False
                     self.event_processed = True
-                elif event.unicode == '+':
-                    self.set_font(self._font_size +1)
-                    self.event_processed = True
-                elif event.unicode == '-':
-                    self.set_font(self._font_size -1)
-                    self.event_processed = True
                 elif event.unicode == 'f':
                     self.ui_toggle_fullscreen()
                     self.event_processed = True
