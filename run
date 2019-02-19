@@ -1,0 +1,6 @@
+#!/bin/sh
+export PRINTER_PORT='/dev/ttyUSB0'
+#export OCTOPRINT_HOST='192.168.10.16'
+#export PRINTER_SPEED='250000'
+
+exec python gui.py
