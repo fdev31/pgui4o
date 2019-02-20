@@ -1,5 +1,5 @@
 ##################################
-OctoPrint UI for touch LCD screens
+OctoPrint UI for LCD touch screens
 ##################################
 
 Attempt to make the printer LCD controller useless if you have a Raspberry Pi
