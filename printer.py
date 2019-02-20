@@ -144,7 +144,7 @@ class PrintCommands: # controller
         # Retract move, doesn't "unprint"
         self.printer_command([
             'G91',
-            'G1 E%d'%MOVE_DELTA,
+            'G1 E%d'%-MOVE_DELTA,
             'G90',
             ])
 
@@ -153,7 +153,7 @@ class PrintCommands: # controller
         self.position_e.increment(MOVE_DELTA)
         self.printer_command([
             'G91',
-            'G1 E%d'% -MOVE_DELTA,
+            'G1 E%d'%MOVE_DELTA,
             'G90',
             ])
 
