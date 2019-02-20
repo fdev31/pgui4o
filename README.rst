@@ -4,9 +4,11 @@ OctoPrint UI for LCD touch screens
 
 Attempt to make the printer LCD controller useless if you have a Raspberry Pi
 
-Optimized for 480x320 screens
+Optimized for 480x320 screens, like the ones you can get on Aliexpress__
 
-Look at the `quick demo`__!
+__ https://www.aliexpress.com/w/wholesale-320x480-raspberry.html
+
+Watch the `short demo`__!
 
 __ https://youtu.be/ve8TRxibCCY
 
