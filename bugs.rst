@@ -1,7 +1,7 @@
 Tickets
 =======
 
-:total-count: 7
+:total-count: 8
 
 --------------------------------------------------------------------------------
 
@@ -63,3 +63,15 @@ Make a better UI feedback on click
 
 Either some fading circle on the center of the zoen
 or a mask per item (more complicated)
+
+--------------------------------------------------------------------------------
+
+Rework click handling (extends #7)
+==================================
+
+:bugid: 8
+:created: 2019-02-21T23:32:52
+:priority: 0
+
+Enable slide mode only after some distance is reached
+else, after some delay, enable long press / repeats
