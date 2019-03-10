@@ -1,7 +1,7 @@
 Tickets
 =======
 
-:total-count: 8
+:total-count: 9
 
 --------------------------------------------------------------------------------
 
@@ -75,3 +75,16 @@ Rework click handling (extends #7)
 
 Enable slide mode only after some distance is reached
 else, after some delay, enable long press / repeats
+
+--------------------------------------------------------------------------------
+
+Add some commands
+=================
+
+:bugid: 9
+:created: 2019-02-23T11:46:51
+:priority: 0
+
+- disable steppers (M18)
+- toggle cold extrusion (M302 P0|1)
+- file load ? (complex widget)

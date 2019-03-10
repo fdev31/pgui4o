@@ -30,8 +30,15 @@ OCTOPRINT_HOSTNAME = os.getenv('OCTOPRINT_HOST', '127.0.0.1') # add /some_suffix
 
 RESX, RESY = (480, 320) # window size (pixels) - should match the LCD size
 PRINTER_POLLING_INTERVAL = 2.0 # seconds between periodic http requests
+
 MIN_SWIPE_DISTANCE = 40 # minimum distance to travel to consider a swipe move
 SWIPE_ANIM_SPEED = 10 # in px/ frame
+
+# long click configuration
+REPEAT_INITIAL_DELAY = 600
+REPEAT_DELAY = 300
+
+EVENT_REPEAT = pygame.USEREVENT + 1
 
 def getResourcesPath(filename):
     paths = [os.path.join('themes', THEME, filename), os.path.join('assets', filename)]
@@ -63,6 +70,7 @@ class App: # View
         self.dirty = False
         self.printer = PrintCommands('http://%s/'%OCTOPRINT_HOSTNAME, PRINT_API_KEY, PORT, BAUD)
         self.mouse_pos = (0, 0)
+        self.key_presses = {}
         self.default_text_color = (0, 0, 0)
 
         if DRY_RUN:
@@ -100,61 +108,79 @@ class App: # View
             else:
                 return self._cur_page + 1
 
-    def on_click_release(self, x, y):
+    def is_swiping(self, x, y):
         old_pos = self.click_grab_start
-
         dist = math.sqrt((x-old_pos[0])**2+ (y-old_pos[1])**2)
         if dist > MIN_SWIPE_DISTANCE:
             if old_pos[0] > x:
-                new_page = self.get_next_page(1)
-                direction = -1
-            elif old_pos[0] < x:
-                new_page = self.get_next_page(-1)
-                direction = 1
+                return -1
             else:
-                direction = 0
-                new_page = self._cur_page # don't change by default
+                return 1
+        return 0
+
+    def run_action_at(self, x, y):
+        for coords, name in self.actions[self._cur_page].items():
+            if x > coords[0] and x < coords[2] and y > coords[1] and y < coords[3]:
+                if name.startswith('ui_'):
+                    fn = getattr(self, name, None)
+                else:
+                    fn = getattr(self.printer, name, None)
+
+                if fn:
+                    try:
+                        action = fn()
+                    except Exception as e:
+                        self.event_processed = -1
+                        print("Error while running %s: %s"%(name, e))
+                    else:
+                        self.dirty = True
+                        self.event_processed = True
+                        if self.event_queue < 200:
+                            self.event_queue += 50
+                        if isinstance(action, set):
+                            for act in action:
+                                self.ui_actions[act]()
+                else:
+                    print("No such command: %s"%name)
+                break # stop on first match
+
+    def on_click_release(self, x, y):
+        direction = self.is_swiping(x, y)
+
+        if direction and not self._repeated: # Swiping !
+            new_page = self.get_next_page(-direction)
 
             # animate the rest of the scrolling
-            if direction:
-                if direction < 0:
-                    r = range(x, self.click_grab_start[0]-self.size[0],  direction*SWIPE_ANIM_SPEED)
-                else:
-                    r = range(x, self.click_grab_start[0]+self.size[0], direction*SWIPE_ANIM_SPEED)
-                for xo in r:
-                    self.click_grab_cur = (xo, 0)
-                    self.draw_ui()
+            if direction < 0:
+                r = range(x, self.click_grab_start[0]-self.size[0],  direction*SWIPE_ANIM_SPEED)
+            else:
+                r = range(x, self.click_grab_start[0]+self.size[0], direction*SWIPE_ANIM_SPEED)
+            for xo in r:
+                self.click_grab_cur = (xo, 0)
+                self.draw_ui()
             self._cur_page = (new_page%self.pages)
-            self.dirty = True
         else:
-            for coords, name in self.actions[self._cur_page].items():
-                if x > coords[0] and x < coords[2] and y > coords[1] and y < coords[3]:
-                    if name.startswith('ui_'):
-                        fn = getattr(self, name, None)
-                    else:
-                        fn = getattr(self.printer, name, None)
+            self.run_action_at(x, y)
 
-                    if fn:
-                        try:
-                            action = fn()
-                        except Exception as e:
-                            self.event_processed = -1
-                            print("Error while running %s: %s"%(name, e))
-                        else:
-                            self.dirty = True
-                            self.event_processed = True
-                            if self.event_queue < 200:
-                                self.event_queue += 50
-                            if isinstance(action, set):
-                                for act in action:
-                                    self.ui_actions[act]()
-                    else:
-                        print("No such command: %s"%name)
-                    break # stop on first match
-
+        self.dirty = True
         self.grab_mode = False
 
+    def on_repeat(self, x, y):
+        if self.grab_mode: # first repeat
+            self.grab_mode = self.is_swiping(x, y) # give swipe a last chance
+            if self.grab_mode: # give up on repeat, let grab mode go
+                self._repeated = False
+                pygame.time.set_timer(EVENT_REPEAT, 0) # stop
+                return
+            else:
+                self._repeated = True # turn on repeat
+                pygame.time.set_timer(EVENT_REPEAT, REPEAT_DELAY) # repeat every 0.3s
+        # normal repeat
+        self.run_action_at(x, y)
+
     def on_click(self, x, y):
+        self._repeated = False
+
         if DEBUG_UI:
             print("%d , %d"%((x, y)))
             a = getattr(self, '_seq', [])
@@ -179,10 +205,14 @@ class App: # View
                 elif event.unicode == 'f':
                     self.ui_toggle_fullscreen()
                     self.event_processed = True
+        elif event.type == EVENT_REPEAT:
+            self.on_repeat(*self.click_grab_cur)
         elif event.type == pygame.MOUSEBUTTONDOWN:
+            pygame.time.set_timer(EVENT_REPEAT, REPEAT_INITIAL_DELAY) # start repeating after 1s
             if event.button == 1:
                 self.on_click(*event.pos)
         elif event.type == pygame.MOUSEBUTTONUP:
+            pygame.time.set_timer(EVENT_REPEAT, 0) # remove click repeat
             self.on_click_release(*event.pos)
         elif event.type == pygame.MOUSEMOTION:
             self.mouse_pos = event.pos
