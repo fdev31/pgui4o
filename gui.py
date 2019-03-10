@@ -32,7 +32,7 @@ RESX, RESY = (480, 320) # window size (pixels) - should match the LCD size
 PRINTER_POLLING_INTERVAL = 2.0 # seconds between periodic http requests
 
 MIN_SWIPE_DISTANCE = 40 # minimum distance to travel to consider a swipe move
-SWIPE_ANIM_SPEED = 10 # in px/ frame
+SWIPE_ANIM_SPEED = 6000.0 # some factor applied to the render time
 
 # long click configuration
 REPEAT_INITIAL_DELAY = 600
@@ -150,11 +150,17 @@ class App: # View
         if direction and not self._repeated: # Swiping !
             new_page = self.get_next_page(-direction)
 
+            # calibrate the animation speed
+            t0 = time.time()
+            self.draw_ui()
+            tt = time.time() - t0
+            delta = max(1, int(tt*SWIPE_ANIM_SPEED))
+
             # animate the rest of the scrolling
             if direction < 0:
-                r = range(x, self.click_grab_start[0]-self.size[0],  direction*SWIPE_ANIM_SPEED)
+                r = range(x, self.click_grab_start[0]-self.size[0],  direction*delta)
             else:
-                r = range(x, self.click_grab_start[0]+self.size[0], direction*SWIPE_ANIM_SPEED)
+                r = range(x, self.click_grab_start[0]+self.size[0], direction*delta)
             for xo in r:
                 self.click_grab_cur = (xo, 0)
                 self.draw_ui()
@@ -175,6 +181,7 @@ class App: # View
             else:
                 self._repeated = True # turn on repeat
                 pygame.time.set_timer(EVENT_REPEAT, REPEAT_DELAY) # repeat every 0.3s
+
         # normal repeat
         self.run_action_at(x, y)
 
