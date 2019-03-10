@@ -19,6 +19,7 @@ class PrintCommands: # controller
         self.position_y = RangedValue('Y', 0, 500)
         self.position_z = RangedValue('Z', 0, 500)
         self.position_e = UnrangedValue('E')
+        self.cold_extrude_checks = True
 
         self.paused = False
         self.printing = False
@@ -73,6 +74,19 @@ class PrintCommands: # controller
             js = {'commands': command}
         r = self.http.post(self.base_url + 'api/printer/command', json=js, **self.req_opts)
         return r.text
+
+    def pre_heat(self):
+        self.printer_command(['M104 S150', 'M140 S60'])
+
+    def motors_off(self):
+        self.printer_command(['M18'])
+
+    def cold_extrude(self):
+        self.cold_extrude_checks = not self.cold_extrude_checks
+        self.printer_command(['M302 P%s'%('1' if self.cold_extrude_checks else '0')]) # 0 disable checks
+
+    def set_origin(self):
+        self.printer_command(['G92 X0 Y0 Z0'])
 
     def baby2zoffset(self):
         self.printer_command(['M206 Z%.3f'%(- (self.position_z.value + self.baby_offset.value)), 'M500'])
