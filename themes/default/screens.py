@@ -5,83 +5,95 @@ __all__ = ['actions', 'widgets']
 
 actions = [
     {
-        (405, 13, 465, 107): 'ui_main_page',
-        (405, 111, 468, 307): 'ui_next_page',
-        (31 , 92, 119 , 170): 'halt',
-        (10, 10, 125, 75) : 'quit',
-        (180, 41, 250, 136): 'pause',
-        (299, 37, 365, 145): 'connect',
+        (453, 1, 478, 315): 'ui_next_page',
+        (8 , 5, 100 , 59): 'quit',
+        (12, 77, 121, 136): 'halt',
+        (15, 154, 127, 203): 'pause',
+        (15, 227, 159, 282): 'connect',
+        (236, 12, 448, 56): 'motors_off',
+        (197, 74, 441, 122): 'cold_extrude',
+        (273, 157, 434, 203): 'set_origin',
+        (287, 227, 434, 276): 'pre_heat',
         },
     {
-        (405, 13, 465, 107): 'ui_main_page',
-        (405, 111, 468, 307): 'ui_next_page',
-        (201, 27, 281, 110): 'home',
-        (88, 164, 148, 219): 'home_xy',
-        (287, 162, 323, 204): 'home_z',
-        (99, 92, 138, 149): 'y_up',
-        (102, 231, 143, 291): 'y_down',
-        (17, 171, 82, 212): 'x_down',
-        (159, 169, 222, 213): 'x_up',
-        (301, 86, 340, 149): 'z_up',
-        (302, 230, 342, 293): 'z_down',
-        (360, 113, 391, 159): 'z_up_small',
-        (357, 220, 396, 271): 'z_down_small',
+        (453, 1, 478, 315): 'ui_main_page',
+        (201, 18, 293, 108): 'home',
+        (101, 127, 175, 202): 'home_xy',
+        (374, 139, 425, 189): 'home_z',
+        (95, 33, 190, 114): 'y_up',
+        (90, 217, 190, 301): 'y_down',
+        (5, 123, 86, 208): 'x_down',
+        (175, 122, 274, 217) : 'x_up',
+        (348, 34, 454, 120): 'z_up',
+        (345, 212, 450, 305): 'z_down',
+        (297, 104, 348, 157): 'z_up_small',
+        (295, 174, 347, 232): 'z_down_small',
         },
     {
-        (405, 13, 465, 107): 'ui_main_page',
-        (405, 111, 468, 307): 'ui_next_page',
-        (60, 82, 119, 147): 'e_temp_up',
-        (66, 152, 117, 215): 'e_temp_down',
-        (196, 82, 251, 146): 'bed_temp_up',
-        (195, 155, 252, 216): 'bed_temp_down',
-        (334, 85, 395, 153): 'fan_up',
-        (334, 158, 390, 225): 'fan_down',
+        (453, 1, 478, 315): 'ui_main_page',
+        (26, 52, 145, 161): 'e_temp_up',
+        (28, 207, 160, 280): 'e_temp_down',
+        (168, 44, 289, 159): 'bed_temp_up',
+        (172, 205, 301, 278): 'bed_temp_down',
+        (324, 44, 453, 165): 'fan_up',
+        (319, 203, 453, 292): 'fan_down',
         },
     {
-        (405, 13, 465, 107): 'ui_main_page',
-        (405, 111, 468, 307): 'ui_next_page',
-        (102, 70, 177, 163): 'e_up',
-        (100, 172, 176, 272): 'e_down',
-        (301, 73, 363, 162): 'baby_up',
-        (301, 173, 366, 267): 'baby_down',
-        (191, 265, 281, 298): 'baby2zoffset',
+        (453, 1, 478, 315): 'ui_main_page',
+        (315, 26, 414, 113): 'e_up',
+        (315, 212, 413, 302): 'e_down',
+        (89, 28, 186, 111): 'baby_up',
+        (88, 217, 187, 301): 'baby_down',
+        (187, 129, 257, 193): 'baby2zoffset',
         }]
 
-
-std_rects = [
-    lambda ui: ((ui.size[0]-75, 12, 63, 100),
-        (200 if ui.event_processed == -1 else 0, 255 if ui.event_processed == True else 0, 255 if ui.printer.printing else 0)),
-    lambda ui: ((ui.size[0]-75, 108, 63, 200),
-        (ui.event_queue, 255 if not ui.printer.offline else 0, 250 if ui.printer.paused else 0)),
-    ]
 
 std_texts = [
         (14, 288, lambda ui: ui.printer.status_text),
     ]
+
 # for each screen:
 # text: x,y,text (handler function)
 # rect: x,y,x2,y2,color (handler function)
 
-widgets = [
-    dict(texts=std_texts+[
-        (157, 175, lambda ui: "BED: %.1f/%d"%ui.printer_info['bed']),
-        (41 , 175, lambda ui: "E: %.1f/%d"%ui.printer_info['extruder']),
-        (291, 175, lambda ui: "FAN: %.1f%%"%ui.printer.fan_speed.percentage),
-        ], rects=std_rects),
-    dict(texts=std_texts+[
-        (18 , 63, lambda ui: "X%d"%ui.printer.position_x.value),
-        (70 , 63, lambda ui: "Y%d"%ui.printer.position_y.value),
-        (120, 63, lambda ui: "Z%d"%ui.printer.position_z.value),
-        ], rects=std_rects),
-    dict(texts=std_texts+[
-        (137, 65, lambda ui: "%.1f/%d"%ui.printer_info['bed']),
-        (21 , 65, lambda ui: "%.1f/%d"%ui.printer_info['extruder']),
-        (271, 65, lambda ui: "%.1f%%"%ui.printer.fan_speed.percentage),
-        ], rects=std_rects),
-    dict(texts=std_texts+[
-        (241, 110, lambda ui: "%.2f"%ui.printer.baby_offset.value),
-        (289 , 273, lambda ui: "Z%.2f"% (-(ui.printer.position_z.value + ui.printer.baby_offset.value))),
-        ], rects=std_rects),
+std_icons = [
+        (452, 5, lambda ui: 'icon_red' if ui.printer.offline else ('icon_blue' if ui.printer.paused else 'icon_green') ),
+        (452, 40, lambda ui: 'icon_orange' if ui.event_queue else 'icon_grey' ),
+        (452, 80, lambda ui: 'icon_flake' if ui.printer.cold_extrude_checks else 'icon_flake_off'),
     ]
 
-text_color = (0, 0, 0)
+widgets = [
+    dict(icons=std_icons,
+        texts=std_texts+[
+         (180, 175, lambda ui: "FAN: %.1f%%"%ui.printer.fan_speed.percentage),
+         (180, 200, lambda ui: "E: %.1f/%d"%ui.printer_info['extruder']),
+         (180, 225, lambda ui: "BED: %.1f/%d"%ui.printer_info['bed']),
+        ], rects=[]),
+    dict(icons=std_icons,
+        texts=std_texts+[
+        (104, 5, lambda ui: "X%d"%ui.printer.position_x.value),
+        (202, 5, lambda ui: "Y%d"%ui.printer.position_y.value),
+        (343, 5, lambda ui: "Z%d"%ui.printer.position_z.value),
+
+         (180,  288, lambda ui: "E:%.1f/%d"%ui.printer_info['extruder']),
+         (280,  288, lambda ui: "B:%.1f/%d"%ui.printer_info['bed']),
+        ], rects=[]),
+    dict(icons=std_icons,
+        texts=std_texts+[
+        (167 , 260, lambda ui: "%.1f/%d"%ui.printer_info['bed']),
+        (34 , 260, lambda ui: "%.1f/%d"%ui.printer_info['extruder']),
+        (321, 260, lambda ui: "%.1f%%"%ui.printer.fan_speed.percentage),
+        ], rects=[]),
+    dict(icons=std_icons,
+        texts=std_texts+[
+        (5 , 147, lambda ui: "%.2f"%ui.printer.baby_offset.value),
+        (381 , 144, lambda ui: "%.2f"%ui.printer.position_e.value),
+        (190, 205, lambda ui: "Z%.2f"% (-(ui.printer.position_z.value + ui.printer.baby_offset.value))),
+
+        (180,  288, lambda ui: "E:%.1f/%d"%ui.printer_info['extruder']),
+        (280,  288, lambda ui: "B:%.1f/%d"%ui.printer_info['bed']),
+        ], rects=[]),
+    ]
+
+
+text_color = (240, 250, 250)
