@@ -281,7 +281,7 @@ class App: # View
         # Event feedback
         if self.event_queue:
             if self.event_queue > 10:
-                pygame.draw.circle(self._screen, (200, 78, 50, 0.1) if self.last_action_failed else (111, 199, 232, 0.1), self.click_grab_start, int(self.event_queue))
+                pygame.draw.circle(self._screen, (200, 78, 50, 0.1) if self.last_action_failed else (111, 199, 232, 0.1), self.click_grab_start, min(70, int(self.event_queue)))
 
         # Debugging overlay
         if DEBUG_UI and not self.grab_mode:
