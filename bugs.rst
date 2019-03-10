@@ -1,7 +1,7 @@
 Tickets
 =======
 
-:total-count: 9
+:total-count: 11
 
 --------------------------------------------------------------------------------
 
@@ -40,3 +40,26 @@ Add some commands
 :priority: 0
 
 Allow some file operations
+
+--------------------------------------------------------------------------------
+
+Review error handling
+=====================
+
+:bugid: 10
+:created: 2019-03-10T23:41:42
+:priority: 0
+
+Sometimes the feedback circle isn't showing the right color
+
+--------------------------------------------------------------------------------
+
+Allow fast increment while long pressing
+========================================
+
+:bugid: 11
+:created: 2019-03-10T23:43:06
+:priority: 0
+
+Long press increments the same way
+it should increment faster
