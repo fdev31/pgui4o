@@ -72,6 +72,8 @@ class App: # View
         self.mouse_pos = (0, 0)
         self.key_presses = {}
         self.default_text_color = (0, 0, 0)
+        self.last_action_failed = False
+        self._ui_draw_time = 1
 
         if DRY_RUN:
             self.printer.http = None
@@ -129,13 +131,16 @@ class App: # View
                 if fn:
                     try:
                         action = fn()
+                        self.event_processed = True
+                        self.last_action_failed = False
                     except Exception as e:
+                        self.last_action_failed = True
+                        action = None
                         self.event_processed = -1
                         print("Error while running %s: %s"%(name, e))
-                    else:
+                    finally:
                         self.dirty = True
-                        self.event_processed = True
-                        if self.event_queue < 200:
+                        if self.event_queue < 100:
                             self.event_queue += 50
                         if isinstance(action, set):
                             for act in action:
@@ -150,11 +155,7 @@ class App: # View
         if direction and not self._repeated: # Swiping !
             new_page = self.get_next_page(-direction)
 
-            # calibrate the animation speed
-            t0 = time.time()
-            self.draw_ui()
-            tt = time.time() - t0
-            delta = max(1, int(tt*SWIPE_ANIM_SPEED))
+            delta = max(1, int(self._ui_draw_time * SWIPE_ANIM_SPEED))
 
             # animate the rest of the scrolling
             if direction < 0:
@@ -252,6 +253,7 @@ class App: # View
         return image
 
     def draw_ui(self):
+        t0 = time.time()
         if self.grab_mode:
             ox = self.click_grab_cur[0] - self.click_grab_start[0]
         else:
@@ -276,6 +278,11 @@ class App: # View
             pos[0] += ox
             pygame.draw.rect(self._screen, color, pos)
 
+        # Event feedback
+        if self.event_queue:
+            if self.event_queue > 10:
+                pygame.draw.circle(self._screen, (200, 78, 50, 0.1) if self.last_action_failed else (111, 199, 232, 0.1), self.click_grab_start, int(self.event_queue))
+
         # Debugging overlay
         if DEBUG_UI and not self.grab_mode:
             for coords, name in self.actions[self._cur_page].items():
@@ -297,6 +304,7 @@ class App: # View
             pygame.draw.rect(self._screen, (0, 0, 0), (self.mouse_pos[0], 0, 1, self.size[1]))
 
         pygame.display.flip()
+        self._ui_draw_time = (self._ui_draw_time + (time.time()-t0))/2.0
 
     def quit(self):
         self._running = False
@@ -311,7 +319,7 @@ class App: # View
                 self.draw_ui()
                 self.dirty = False
                 if self.event_queue:
-                    self.event_queue -= 10
+                    self.event_queue = max(0, self.event_queue - (self._ui_draw_time*100))
             else:
                 pygame.time.wait(200)
         pygame.quit()

@@ -14,28 +14,6 @@ Get position from printer !
 
 --------------------------------------------------------------------------------
 
-New theme: add icons
-====================
-
-:bugid: 3
-:created: 2019-02-18T22:58:20
-:priority: 0
-
-Some icons should be added to the right side
-
---------------------------------------------------------------------------------
-
-New theme: make main page
-=========================
-
-:bugid: 4
-:created: 2019-02-18T22:59:06
-:priority: 0
-
-Today it's a copy of the default theme, should be fixed
-
---------------------------------------------------------------------------------
-
 Investigate why fonts are rendered very differently on the raspberry
 ====================================================================
 
@@ -54,18 +32,6 @@ Allow Horizontal swap option on themes
 
 --------------------------------------------------------------------------------
 
-Make a better UI feedback on click
-==================================
-
-:bugid: 7
-:created: 2019-02-18T23:13:16
-:priority: 0
-
-Either some fading circle on the center of the zoen
-or a mask per item (more complicated)
-
---------------------------------------------------------------------------------
-
 Add some commands
 =================
 
@@ -73,6 +39,4 @@ Add some commands
 :created: 2019-02-23T11:46:51
 :priority: 0
 
-- disable steppers (M18)
-- toggle cold extrusion (M302 P0|1)
-- file load ? (complex widget)
+Allow some file operations
