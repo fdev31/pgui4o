@@ -5,12 +5,13 @@ __all__ = ['actions', 'widgets']
 
 actions = [
     {
-        (405, 13, 465, 107): 'ui_main_page',
-        (405, 111, 468, 307): 'ui_next_page',
-        (31 , 92, 119 , 170): 'halt',
-        (10, 10, 125, 75) : 'quit',
-        (180, 41, 250, 136): 'pause',
-        (299, 37, 365, 145): 'connect',
+        (453, 1, 478, 315): 'ui_next_page',
+        (8 , 5, 100 , 59): 'quit',
+        (12, 77, 121, 136): 'halt',
+        (15, 154, 127, 203): 'pause',
+        (15, 227, 159, 282): 'connect',
+        (236, 12, 448, 56): 'motors_off',
+        (200, 79, 462, 124): 'cold_extrude',
         },
     {
         (453, 1, 478, 315): 'ui_main_page',
@@ -63,15 +64,10 @@ std_icons = [
 
 widgets = [
     dict(texts=std_texts+[
-        (157, 175, lambda ui: "BED: %.1f/%d"%ui.printer_info['bed']),
-        (41 , 175, lambda ui: "E: %.1f/%d"%ui.printer_info['extruder']),
-        (291, 175, lambda ui: "FAN: %.1f%%"%ui.printer.fan_speed.percentage),
-        ], rects=[
-            lambda ui: ((ui.size[0]-75, 12, 63, 100),
-                (200 if ui.event_processed == -1 else 0, 255 if ui.event_processed == True else 0, 255 if ui.printer.printing else 0)),
-            lambda ui: ((ui.size[0]-75, 108, 63, 200),
-                (ui.event_queue, 255 if not ui.printer.offline else 0, 250 if ui.printer.paused else 0)),
-            ]),
+        (290, 175, lambda ui: "FAN: %.1f%%"%ui.printer.fan_speed.percentage),
+        (290, 200, lambda ui: "E: %.1f/%d"%ui.printer_info['extruder']),
+        (290, 225, lambda ui: "BED: %.1f/%d"%ui.printer_info['bed']),
+        ], rects=[]),
     dict(icons=std_icons,
         texts=std_texts+[
         (104, 5, lambda ui: "X%d"%ui.printer.position_x.value),
