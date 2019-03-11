@@ -23,15 +23,6 @@ Investigate why fonts are rendered very differently on the raspberry
 
 --------------------------------------------------------------------------------
 
-Allow Horizontal swap option on themes
-======================================
-
-:bugid: 6
-:created: 2019-02-18T01:50:27
-:priority: 0
-
---------------------------------------------------------------------------------
-
 Add some commands
 =================
 
