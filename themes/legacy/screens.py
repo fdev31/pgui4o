@@ -84,4 +84,6 @@ widgets = [
         ], rects=std_rects),
     ]
 
-text_color = (0, 0, 0)
+options = {
+    'default_text_color' : (0, 0, 0)
+    }

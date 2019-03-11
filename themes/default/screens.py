@@ -96,4 +96,8 @@ widgets = [
     ]
 
 
-text_color = (240, 250, 250)
+options = dict(
+    default_text_color = (240, 250, 250),
+    vertical_swipe = True,
+    keep_icons_on_swipe = True
+    )

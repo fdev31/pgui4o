@@ -13,6 +13,13 @@ DRY_RUN = os.getenv('DRYRUN', False) # If True do not do anything (no HTTP reque
 DEBUG_UI = os.getenv('DEBUG', False) # Show additional debugging information
 THEME = os.getenv('THEME', 'default')
 
+class UIOptions:
+    def __init__(self, opts):
+        self._opts = opts
+
+    def __getattr__(self, name):
+        return self._opts.get(name, False)
+
 try:
     FileNotFoundError
 except NameError: # make python2 accept python3 exceptions
@@ -71,7 +78,6 @@ class App: # View
         self.printer = PrintCommands('http://%s/'%OCTOPRINT_HOSTNAME, PRINT_API_KEY, PORT, BAUD)
         self.mouse_pos = (0, 0)
         self.key_presses = {}
-        self.default_text_color = (0, 0, 0)
         self.last_action_failed = False
         self._ui_draw_time = 1
 
@@ -114,7 +120,7 @@ class App: # View
         old_pos = self.click_grab_start
         dist = math.sqrt((x-old_pos[0])**2+ (y-old_pos[1])**2)
         if dist > MIN_SWIPE_DISTANCE:
-            if old_pos[0] > x:
+            if (self.options.vertical_swipe and old_pos[1] > y) or (not self.options.vertical_swipe and old_pos[0] > x):
                 return -1
             else:
                 return 1
@@ -158,13 +164,22 @@ class App: # View
             delta = max(1, int(self._ui_draw_time * SWIPE_ANIM_SPEED))
 
             # animate the rest of the scrolling
-            if direction < 0:
-                r = range(x, self.click_grab_start[0]-self.size[0],  direction*delta)
+            if self.options.vertical_swipe:
+                if direction < 0:
+                    r = range(y, self.click_grab_start[1]-self.size[1],  direction*delta)
+                else:
+                    r = range(y, self.click_grab_start[1]+self.size[1], direction*delta)
+                for yo in r:
+                    self.click_grab_cur = (0, yo)
+                    self.draw_ui()
             else:
-                r = range(x, self.click_grab_start[0]+self.size[0], direction*delta)
-            for xo in r:
-                self.click_grab_cur = (xo, 0)
-                self.draw_ui()
+                if direction < 0:
+                    r = range(x, self.click_grab_start[0]-self.size[0],  direction*delta)
+                else:
+                    r = range(x, self.click_grab_start[0]+self.size[0], direction*delta)
+                for xo in r:
+                    self.click_grab_cur = (xo, 0)
+                    self.draw_ui()
             self._cur_page = (new_page%self.pages)
         else:
             self.run_action_at(x, y)
@@ -237,7 +252,7 @@ class App: # View
 
     def render_text(self, text, x, y, color=None):
         if not color:
-            color = self.default_text_color
+            color = self.options.default_text_color
         text = self.font.render(text, True, color)
         self._screen.blit(text, (x, y))
 
@@ -254,28 +269,44 @@ class App: # View
 
     def draw_ui(self):
         t0 = time.time()
+
         if self.grab_mode:
-            ox = self.click_grab_cur[0] - self.click_grab_start[0]
+            if self.options.vertical_swipe:
+                ox = 0
+                oy = self.click_grab_cur[1] - self.click_grab_start[1]
+            else:
+                ox = self.click_grab_cur[0] - self.click_grab_start[0]
+                oy = 0
         else:
             ox = 0
+            oy = 0
 
         if ox > 0:
             self._screen.blit(self._backgrounds[self.get_next_page(-1)], (ox-self.size[0], 0))
         elif ox < 0:
             self._screen.blit(self._backgrounds[self.get_next_page(1)], (ox+self.size[0], 0))
 
-        self._screen.blit(self._backgrounds[self._cur_page], (ox, 0))
+        if oy > 0:
+            self._screen.blit(self._backgrounds[self.get_next_page(-1)], (0, oy-self.size[1]))
+        elif oy < 0:
+            self._screen.blit(self._backgrounds[self.get_next_page(1)], (0, oy+self.size[1]))
+
+        self._screen.blit(self._backgrounds[self._cur_page], (ox, oy))
 
         for x, y, icon in self.widgets[self._cur_page]['icons']:
-            self.render_image(icon(self), ox+x, y)
+            if self.options.keep_icons_on_swipe:
+                self.render_image(icon(self), x, y)
+            else:
+                self.render_image(icon(self), ox+x, oy+y)
 
         for text in self.widgets[self._cur_page]['texts']:
-            self.render_text(text[2](self), ox + text[0], text[1])
+            self.render_text(text[2](self), ox + text[0], oy + text[1])
 
         for rect in self.widgets[self._cur_page]['rects']:
             pos, color = rect(self)
             pos = list(pos)
             pos[0] += ox
+            pos[1] += oy
             pygame.draw.rect(self._screen, color, pos)
 
         # Event feedback
@@ -333,6 +364,6 @@ if __name__ == "__main__" :
             if item not in widget:
                 widget[item] = []
     theApp = App(actions = actions, widgets = widgets)
-    theApp.default_text_color = text_color
+    theApp.options = UIOptions(options)
     theApp.run()
 
