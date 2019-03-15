@@ -63,14 +63,14 @@ class App: # View
     def __init__(self, actions, widgets):
         self.actions = actions
         self.widgets = widgets
-        self.pages = len(widgets)
+        self.page_count = len(widgets)
         self._running = True
         self._cur_page = 0
         self.last_update = 0
         self.size = [RESX, RESY]
         pygame.init()
         self._screen = pygame.display.set_mode(self.size, pygame.HWSURFACE | pygame.DOUBLEBUF)
-        self._backgrounds = [pygame.image.load(getResourcesPath('screen%d.png'%(i+1))).convert() for i in range(self.pages)]
+        self._backgrounds = [pygame.image.load(getResourcesPath('screen%d.png'%(i+1))).convert() for i in range(self.page_count)]
         self.set_font(20)
         self.event_queue = 0
         self.grab_mode = False
@@ -101,20 +101,39 @@ class App: # View
         self._cur_page = 0
 
     def ui_next_page(self):
-        self._cur_page = (self._cur_page+1)%self.pages
+        self._cur_page = (self._cur_page+1)%self.page_count
         if self._cur_page == 0:
             self._cur_page = 1 # avoids showing splash
 
-    def get_next_page(self, offset):
+    @property
+    def available_pages(self):
+        # Starts at 1 to always avoid the splash screen
+        available_pages = list(range(1, self.page_count))
+        if self.printer.status_text == 'Printing':
+            return available_pages[1:]  # first screen is MOVE, don't allow while printing
+        return available_pages
+
+    def get_next_page(self, offset, current=None):
+        if current is None:
+            current = self._cur_page
+        elif current < 0:
+            return self.get_next_page(offset, self.page_count)
+
         if offset < 0:
-            if self._cur_page == 1:
-                return self.pages-1
-            return self._cur_page - 1
-        else:
-            if self._cur_page + 1 >= self.pages:
-                return 1
+            if current == 0:
+                page = self.page_count-1
             else:
-                return self._cur_page + 1
+                page = current - 1
+        else:
+            if current + 1 >= self.page_count:
+                page = 0
+            else:
+                page = current + 1
+
+        if page not in self.available_pages:
+            return self.get_next_page(offset, page)
+        else:
+            return page
 
     def is_swiping(self, x, y):
         old_pos = self.click_grab_start
@@ -180,7 +199,7 @@ class App: # View
                 for xo in r:
                     self.click_grab_cur = (xo, 0)
                     self.draw_ui()
-            self._cur_page = (new_page%self.pages)
+            self._cur_page = (new_page%self.page_count)
         else:
             self.run_action_at(x, y)
 
