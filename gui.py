@@ -375,7 +375,7 @@ class App: # View
         pygame.quit()
 
 if __name__ == "__main__" :
-    fp = getResourcesPath('screens.py')
+    fp = getResourcesPath('layout.py')
     # TODO: cleaner theme loading
     exec(open(fp).read())
     for widget in widgets:
