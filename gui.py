@@ -108,6 +108,7 @@ class App: # View
     @property
     def available_pages(self):
         # Starts at 1 to always avoid the splash screen
+        # TODO: make it configurable in the theme layout !
         available_pages = list(range(1, self.page_count))
         if self.printer.status_text == 'Printing':
             return available_pages[1:]  # first screen is MOVE, don't allow while printing
