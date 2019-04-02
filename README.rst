@@ -41,7 +41,7 @@ Roadmap
 
 Look at the `TODO list`__
 
-__ https://github.com/fdev31/pgui4o/blob/master/bugs.rst
+__ https://github.com/fdev31/pgui4o/blob/master/tickets.rst
 
 Developers / customizing
 ########################
