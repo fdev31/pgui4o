@@ -11,6 +11,7 @@ class PrintCommands: # controller
         self.baudrate = baudrate
         self.base_url = prefix
 
+        self.print_speed = RangedValue('S', 0, 300, init=100)
         self.baby_offset = UnrangedValue('Z')
         self.bed_temp = RangedValue('S', 0, 120)
         self.e_temp = RangedValue('S', 0, 260)
@@ -81,9 +82,18 @@ class PrintCommands: # controller
     def motors_off(self):
         self.printer_command(['M18'])
 
+    def toggle_volumetric(self):
+        self.volumetric_enabled = not self.volumetric_enabled
+        self.printer_command(['M200 D%s'%(self.filament_diameter if self.volumetric_enabled else '0')])
+
     def cold_extrude(self):
         self.cold_extrude_checks = not self.cold_extrude_checks
         self.printer_command(['M302 P%s'%('1' if self.cold_extrude_checks else '0')]) # 0 disable checks
+
+    def set_speed(self, x, y):
+        val = int((x+15)*0.65)
+        self.print_speed.value = val
+        self.printer_command(['M220 S%d'%val])
 
     def set_origin(self):
         self.printer_command(['G92 X0 Y0 Z0'])

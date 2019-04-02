@@ -45,7 +45,12 @@ actions = [
         (89, 28, 186, 111): 'baby_up',
         (88, 217, 187, 301): 'baby_down',
         (187, 129, 257, 193): 'baby2zoffset',
-        }]
+        },
+    {
+        (453, 1, 478, 315): 'ui_main_page',
+        (14, 114, 430, 209): 'set_speed',
+        },
+    ]
 
 
 std_texts = [
@@ -93,6 +98,14 @@ widgets = [
         (180,  288, lambda ui: "E:%.1f/%d"%ui.printer_info['extruder']),
         (280,  288, lambda ui: "B:%.1f/%d"%ui.printer_info['bed']),
         ], rects=[]),
+    dict(icons=std_icons,
+        texts=std_texts + [
+            (127, 43, lambda ui: "%d%%"%ui.printer.print_speed.value),
+
+            (180,  288, lambda ui: "E:%.1f/%d"%ui.printer_info['extruder']),
+            (280,  288, lambda ui: "B:%.1f/%d"%ui.printer_info['bed']),
+            ],
+        rects=[]),
     ]
 
 

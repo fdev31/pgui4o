@@ -156,7 +156,10 @@ class App: # View
 
                 if fn:
                     try:
-                        action = fn()
+                        try:
+                            action = fn(x, y)
+                        except TypeError:
+                            action = fn()
                         self.event_processed = True
                         self.last_action_failed = False
                     except Exception as e:
