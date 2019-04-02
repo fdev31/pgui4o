@@ -7,7 +7,7 @@ actions = [
     {
         (453, 1, 478, 315): 'ui_next_page',
         (8 , 5, 100 , 59): 'quit',
-        (12, 77, 121, 136): 'halt',
+        (13, 76, 182, 128): 'toggle_volumetric',
         (15, 154, 127, 203): 'pause',
         (15, 227, 159, 282): 'connect',
         (236, 12, 448, 56): 'motors_off',
@@ -62,6 +62,7 @@ std_texts = [
 # rect: x,y,x2,y2,color (handler function)
 
 std_icons = [
+        (452 , 261, lambda ui: 'icon_cube' if ui.printer.volumetric_enabled else ''),
         (452, 5, lambda ui: 'icon_red' if ui.printer.offline else ('icon_blue' if ui.printer.paused else 'icon_green') ),
         (452, 40, lambda ui: 'icon_orange' if ui.event_queue else 'icon_grey' ),
         (452, 80, lambda ui: 'icon_flake' if ui.printer.cold_extrude_checks else 'icon_flake_off'),

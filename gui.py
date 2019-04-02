@@ -317,10 +317,12 @@ class App: # View
         self._screen.blit(self._backgrounds[self._cur_page], (ox, oy))
 
         for x, y, icon in self.widgets[self._cur_page]['icons']:
-            if self.options.keep_icons_on_swipe:
-                self.render_image(icon(self), x, y)
-            else:
-                self.render_image(icon(self), ox+x, oy+y)
+            pic = icon(self)
+            if pic:
+                if self.options.keep_icons_on_swipe:
+                    self.render_image(pic, x, y)
+                else:
+                    self.render_image(pic, ox+x, oy+y)
 
         for text in self.widgets[self._cur_page]['texts']:
             self.render_text(text[2](self), ox + text[0], oy + text[1])

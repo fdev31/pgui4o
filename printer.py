@@ -21,6 +21,8 @@ class PrintCommands: # controller
         self.position_z = RangedValue('Z', 0, 500)
         self.position_e = UnrangedValue('E')
         self.cold_extrude_checks = True
+        self.volumetric_enabled = True
+        self.filament_diameter = 1.75
 
         self.paused = False
         self.printing = False
@@ -272,3 +274,4 @@ class RangedValue:
     @property
     def percentage(self):
         return (self.value - self.min) * 100.0 / self.max
+
