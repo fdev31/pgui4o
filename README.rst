@@ -42,3 +42,13 @@ Roadmap
 Look at the `TODO list`__
 
 __ https://github.com/fdev31/pgui4o/blob/master/bugs.rst
+
+Developers / customizing
+########################
+
+Contributors are welcome, here are some reference commits as quick starts
+
+Adding a new screen to the UI with new actions & attributes:
+
+`be6d9ae3e30a23a63a9d857682707e4206b6ebdd <https://github.com/fdev31/pgui4o/commit/be6d9ae3e30a23a63a9d857682707e4206b6ebdd>`_
+   
