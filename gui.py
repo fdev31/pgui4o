@@ -98,12 +98,21 @@ class App: # View
 
     def set_font(self, size=20):
         if not getattr(self, '_font_size', None) or size != self._font_size:
+            fonts = getattr(self, '_all_fonts', {})
             self._font_size = size
-            try:
-                self.font = pygame.font.SysFont("impact", self._font_size)
-                print("Found the system font")
-            except Exception:
-                self.font = pygame.font.Font(getResourcesPath("impact.ttf"), self._font_size)
+            font = fonts.get(size, None)
+            if font:
+                self.font = font
+            else:
+                try:
+                    self.font = pygame.font.SysFont("impact", self._font_size)
+                    print("Found the system font")
+                except Exception:
+                    self.font = pygame.font.Font(getResourcesPath("impact.ttf"), self._font_size)
+
+            if size not in fonts:
+                fonts[size] = self.font
+                self._all_fonts = fonts
 
     def ui_toggle_fullscreen(self):
         pygame.display.toggle_fullscreen()
