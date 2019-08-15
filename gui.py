@@ -82,7 +82,14 @@ class App: # View
         self._ui_draw_time = 1
 
         if DRY_RUN:
-            self.printer.http = None
+            class _DummyHttpModule:
+                def __getattr__(self, name):
+                    return self
+                def __call__(self, *args, **kw):
+                    print("Dummy HTTP %s %s"%(args, kw))
+                    raise RuntimeError('Dry run... calls will fail')
+
+            self.printer.http = _DummyHttpModule()
         else:
             if not DEBUG_UI and not os.getenv('NOFS'):
                 self.ui_toggle_fullscreen()
