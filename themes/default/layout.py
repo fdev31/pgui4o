@@ -8,7 +8,7 @@ actions = [
         (453, 1, 478, 315): 'ui_next_page',
         (8 , 5, 100 , 59): 'quit',
         (13, 76, 182, 128): 'toggle_volumetric',
-        (15, 154, 127, 203): 'pause',
+        (15, 154, 127, 203): 'ui_pause_popup',
         (15, 227, 159, 282): 'connect',
         (236, 12, 448, 56): 'motors_off',
         (197, 74, 441, 122): 'cold_extrude',
@@ -106,7 +106,9 @@ widgets = [
             (180,  288, lambda ui: "E:%.1f/%d"%ui.printer_info['extruder']),
             (280,  288, lambda ui: "B:%.1f/%d"%ui.printer_info['bed']),
             ],
-        rects=[]),
+        rects=[
+                lambda ui: ((4, 160, ui.printer.print_speed.value*(1/0.65)-15, 3), (min(255, ui.printer.print_speed.value+100), 200, 215)),
+            ]),
     ]
 
 

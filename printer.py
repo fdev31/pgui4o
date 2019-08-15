@@ -130,6 +130,12 @@ class PrintCommands: # controller
         stop_count += 1
         self._stop_cnt = stop_count
 
+    def restart_print(self):
+        self.job(command="restart")
+
+    def cancel_print(self):
+        self.job(command="cancel")
+
     def pause(self):
         self.paused = not self.paused
         if self.paused:

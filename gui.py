@@ -146,9 +146,29 @@ class App: # View
                 return 1
         return 0
 
+    def ui_pause_popup(self, x, y):
+        self.printer.pause()
+        # show the popup
+        self.add_popup({
+            'actions' : ['pause', 'restart_print', 'cancel_print', ''],
+            'captions' : ['resume', 'restart', 'cancel', 'close popup'],
+            })
+
+    def ui_remove_popup(self):
+        self._popups.pop(0)
+        self.set_font()
+
+    def add_popup(self, popup):
+        popups = getattr(self, '_popups', [])
+        popups.append(popup)
+        self._popups = popups
+
     def run_action_at(self, x, y):
-        for coords, name in self.actions[self._cur_page].items():
+
+        def _foo(coords, name):
             if x > coords[0] and x < coords[2] and y > coords[1] and y < coords[3]:
+                if not name: # Allow "no op" actions
+                    return True
                 if name.startswith('ui_'):
                     fn = getattr(self, name, None)
                 else:
@@ -162,11 +182,13 @@ class App: # View
                             action = fn()
                         self.event_processed = True
                         self.last_action_failed = False
+                        return True # stop on first match
                     except Exception as e:
                         self.last_action_failed = True
                         action = None
                         self.event_processed = -1
                         print("Error while running %s: %s"%(name, e))
+                        return True
                     finally:
                         self.dirty = True
                         if self.event_queue < 100:
@@ -174,9 +196,20 @@ class App: # View
                         if isinstance(action, set):
                             for act in action:
                                 self.ui_actions[act]()
-                else:
-                    print("No such command: %s"%name)
-                break # stop on first match
+            return False
+
+        if self._popups:
+            actions = self._popups[0]['actions']
+            height = self.size[1]/len(actions)
+            for i, action in enumerate(actions):
+                if _foo( (i, height*i, self.size[0], height*(i+1)), action):
+                    self.ui_remove_popup()
+                    break
+        else:
+            for coords, name in self.actions[self._cur_page].items():
+                if _foo(coords, name):
+                    break
+
 
     def on_click_release(self, x, y):
         direction = self.is_swiping(x, y)
@@ -293,7 +326,22 @@ class App: # View
     def draw_ui(self):
         t0 = time.time()
 
-        if self.grab_mode:
+        # Popups
+
+        special_mode = False
+        if self._popups:
+            pygame.draw.rect(self._screen, (100, 100, 120), (0, 0, self.size[0], self.size[1]))
+
+            options = self._popups[0]['captions']
+            sz = int(self.size[1]/len(options))
+            self.set_font(sz-5)
+            for i, label in enumerate(options):
+                self.render_text(label, 20, i*sz)
+
+            special_mode = True
+            self.set_font()
+
+        if not special_mode and self.grab_mode:
             if self.options.vertical_swipe:
                 ox = 0
                 oy = self.click_grab_cur[1] - self.click_grab_start[1]
@@ -304,35 +352,36 @@ class App: # View
             ox = 0
             oy = 0
 
-        if ox > 0:
-            self._screen.blit(self._backgrounds[self.get_next_page(-1)], (ox-self.size[0], 0))
-        elif ox < 0:
-            self._screen.blit(self._backgrounds[self.get_next_page(1)], (ox+self.size[0], 0))
+        if not special_mode:
+            if ox > 0:
+                self._screen.blit(self._backgrounds[self.get_next_page(-1)], (ox-self.size[0], 0))
+            elif ox < 0:
+                self._screen.blit(self._backgrounds[self.get_next_page(1)], (ox+self.size[0], 0))
 
-        if oy > 0:
-            self._screen.blit(self._backgrounds[self.get_next_page(-1)], (0, oy-self.size[1]))
-        elif oy < 0:
-            self._screen.blit(self._backgrounds[self.get_next_page(1)], (0, oy+self.size[1]))
+            if oy > 0:
+                self._screen.blit(self._backgrounds[self.get_next_page(-1)], (0, oy-self.size[1]))
+            elif oy < 0:
+                self._screen.blit(self._backgrounds[self.get_next_page(1)], (0, oy+self.size[1]))
 
-        self._screen.blit(self._backgrounds[self._cur_page], (ox, oy))
+            self._screen.blit(self._backgrounds[self._cur_page], (ox, oy))
 
-        for x, y, icon in self.widgets[self._cur_page]['icons']:
-            pic = icon(self)
-            if pic:
-                if self.options.keep_icons_on_swipe:
-                    self.render_image(pic, x, y)
-                else:
-                    self.render_image(pic, ox+x, oy+y)
+            for x, y, icon in self.widgets[self._cur_page]['icons']:
+                pic = icon(self)
+                if pic:
+                    if self.options.keep_icons_on_swipe:
+                        self.render_image(pic, x, y)
+                    else:
+                        self.render_image(pic, ox+x, oy+y)
 
-        for text in self.widgets[self._cur_page]['texts']:
-            self.render_text(text[2](self), ox + text[0], oy + text[1])
+            for text in self.widgets[self._cur_page]['texts']:
+                self.render_text(text[2](self), ox + text[0], oy + text[1])
 
-        for rect in self.widgets[self._cur_page]['rects']:
-            pos, color = rect(self)
-            pos = list(pos)
-            pos[0] += ox
-            pos[1] += oy
-            pygame.draw.rect(self._screen, color, pos)
+            for rect in self.widgets[self._cur_page]['rects']:
+                pos, color = rect(self)
+                pos = list(pos)
+                pos[0] += ox
+                pos[1] += oy
+                pygame.draw.rect(self._screen, color, pos)
 
         # Event feedback
         if self.event_queue:
@@ -340,7 +389,7 @@ class App: # View
                 pygame.draw.circle(self._screen, (200, 78, 50, 0.1) if self.last_action_failed else (111, 199, 232, 0.1), self.click_grab_start, min(70, int(self.event_queue)))
 
         # Debugging overlay
-        if DEBUG_UI and not self.grab_mode:
+        if DEBUG_UI and not (self.grab_mode or special_mode):
             for coords, name in self.actions[self._cur_page].items():
                 s = pygame.Surface((coords[2]-coords[0], coords[3]-coords[1]))
                 s.set_alpha(128)
@@ -366,6 +415,8 @@ class App: # View
         self._running = False
 
     def run(self):
+        self._popups = []
+        self._pending_actions = []
         while( self._running ):
             self.event_processed = False
             for event in pygame.event.get():
