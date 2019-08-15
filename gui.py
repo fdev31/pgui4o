@@ -334,7 +334,7 @@ class App: # View
 
             options = self._popups[0]['captions']
             sz = int(self.size[1]/len(options))
-            self.set_font(sz-5)
+            self.set_font(sz-20)
             for i, label in enumerate(options):
                 self.render_text(label, 20, i*sz)
 
