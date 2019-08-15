@@ -83,10 +83,12 @@ class App: # View
 
         if DRY_RUN:
             class _DummyHttpModule:
+                def __init__(self, name=''):
+                    self.name = name
                 def __getattr__(self, name):
-                    return self
+                    return self.__class__(name)
                 def __call__(self, *args, **kw):
-                    print("Dummy HTTP %s %s"%(args, kw))
+                    print("Dummy HTTP %s %s %s"%(self.name, args, kw))
                     raise RuntimeError('Dry run... calls will fail')
 
             self.printer.http = _DummyHttpModule()
