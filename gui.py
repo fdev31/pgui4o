@@ -97,12 +97,13 @@ class App: # View
         self.ui_actions = { 'quit': self.quit }
 
     def set_font(self, size=20):
-        self._font_size = size
-        try:
-            self.font = pygame.font.SysFont("impact", self._font_size)
-            print("Found the system font")
-        except Exception:
-            self.font = pygame.font.Font(getResourcesPath("impact.ttf"), self._font_size)
+        if not getattr(self, '_font_size', None) or size != self._font_size:
+            self._font_size = size
+            try:
+                self.font = pygame.font.SysFont("impact", self._font_size)
+                print("Found the system font")
+            except Exception:
+                self.font = pygame.font.Font(getResourcesPath("impact.ttf"), self._font_size)
 
     def ui_toggle_fullscreen(self):
         pygame.display.toggle_fullscreen()
@@ -349,7 +350,6 @@ class App: # View
                 self.render_text(label, 20, i*sz)
 
             special_mode = True
-            self.set_font()
 
         if not special_mode and self.grab_mode:
             if self.options.vertical_swipe:
