@@ -91,8 +91,10 @@ class App: # View
 
     def set_font(self, size=20):
         self._font_size = size
-        self.font = pygame.font.Font(getResourcesPath("impact.ttf"), self._font_size)
-        #self.font = pygame.font.SysFont("impact", self._font_size)
+        try:
+            self.font = pygame.font.SysFont("impact", self._font_size)
+        except Exception:
+            self.font = pygame.font.Font(getResourcesPath("impact.ttf"), self._font_size)
 
     def ui_toggle_fullscreen(self):
         pygame.display.toggle_fullscreen()
@@ -165,7 +167,7 @@ class App: # View
 
     def run_action_at(self, x, y):
 
-        def _foo(coords, name):
+        def action_match(name, coords):
             if x > coords[0] and x < coords[2] and y > coords[1] and y < coords[3]:
                 if not name: # Allow "no op" actions
                     return True
@@ -202,12 +204,12 @@ class App: # View
             actions = self._popups[0]['actions']
             height = self.size[1]/len(actions)
             for i, action in enumerate(actions):
-                if _foo( (i, height*i, self.size[0], height*(i+1)), action):
+                if action_match(action, (i, height*i, self.size[0], height*(i+1))):
                     self.ui_remove_popup()
                     break
         else:
             for coords, name in self.actions[self._cur_page].items():
-                if _foo(coords, name):
+                if action_match(name, coords):
                     break
 
 
