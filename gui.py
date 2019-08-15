@@ -93,6 +93,7 @@ class App: # View
         self._font_size = size
         try:
             self.font = pygame.font.SysFont("impact", self._font_size)
+            print("Found the system font")
         except Exception:
             self.font = pygame.font.Font(getResourcesPath("impact.ttf"), self._font_size)
 

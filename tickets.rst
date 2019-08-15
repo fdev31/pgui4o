@@ -1,7 +1,7 @@
 Tickets
 =======
 
-:total-count: 12
+:total-count: 14
 
 --------------------------------------------------------------------------------
 
@@ -20,6 +20,8 @@ Investigate why fonts are rendered very differently on the raspberry
 :bugid: 5
 :created: 2019-02-18T22:59:27
 :priority: 0
+
+probably a DPI issue
 
 --------------------------------------------------------------------------------
 
@@ -62,11 +64,19 @@ it should increment faster
 
 --------------------------------------------------------------------------------
 
-Add volumetric setting
-======================
+Introduce something nice to get the ui/controller ratio
+=======================================================
 
-:bugid: 12
-:created: 2019-03-12T22:18:13
+:bugid: 14
+:created: 2019-04-25T00:29:36
 :priority: 0
+:started: 2019-04-25T00:29:45
 
-Could be a switch on/off like cold extrude
+Current print speed is a mess
+make something to fix this
+
+Some kind of two-ways bridge between UI input & processed values
+
+- should be provided by the UI
+   - probably in layout ? Introduce something new, ``transformers``?
+- registers layer allowed to transform the data on user input (used by current lambdas ?)
